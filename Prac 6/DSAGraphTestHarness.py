@@ -27,13 +27,13 @@ print("\nTest 2  - Add Vertexs")
 print("======================")
 try:
     numTest +=1
-    myGraph.inputHandler('A','B') # create node  a and b and connecs them
-    myGraph.inputHandler('A','C')
-    myGraph.inputHandler('B','C')
-    myGraph.inputHandler('D','C')
-    myGraph.inputHandler('B','E')
-    myGraph.inputHandler('A','E')
-    myGraph.inputHandler('F','E')
+    myGraph.inputHandler('A','B',10.2) # create node  a and b and connecs them
+    myGraph.inputHandler('A','C',15.4)
+    myGraph.inputHandler('B','C',3.2)
+    myGraph.inputHandler('D','C',1.0)
+    myGraph.inputHandler('B','E',5.8)
+    myGraph.inputHandler('A','E',4.9)
+    myGraph.inputHandler('F','E',7.2)
     if myGraph.hasVertex('A') is not True:
         raise Exception("Vertex not added") 
     numPass +=1
@@ -122,6 +122,20 @@ try:
     print("Passed")
 except:
     print("Failed")
+
+print("\nTest 8 - Edge Weight ")
+print("======================")
+#try:
+numTest +=1
+vertex1 = myGraph.getVertex('A')
+edges = vertex1.getAdjacent()
+print(edges)
+if 1+2 ==4:
+    pass 
+numPass +=1
+print("Passed")
+#except:
+print("Failed")
 
 print("\n Test results")
 print(str(numPass)+"/"+str(numTest))

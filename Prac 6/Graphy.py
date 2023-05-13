@@ -2,6 +2,7 @@ from LinkedList import *
 import numpy as np
 import StackAndQ as sq
 import inSort
+
 class DSAGraph():
     # fields: vertices, edge(DsaLinkedList)
     
@@ -10,50 +11,56 @@ class DSAGraph():
         self.vertCount = 0
         self.edgeCount = 0
 
-    def inputHandler(self,label,link):
+    # process the inout before handing over
+    def inputHandler(self,label,link,weight):
         try:
             if label.isalpha() is False or link.isalpha() is False:
                 raise AttributeError("Invalid input type")
             elif len(label) != 1 or len(link) != 1:
-                raise ValueError("Only chars acepted")
+                raise ValueError("Only chars acepted for vertxes")
+            weight = float(weight)
+            if weight <= 0:
+                raise ValueError("Edge weight must a positive number")
         except AttributeError as e:
                 print("Only Char character accepted")
         except ValueError as e:
-            print("Input should be two chars, check your spacing")
+            print("Invalid input detected: "+str(e))
         else:
-            self._inputHandler(label,link)
+            self._inputHandler(label,link,weight)
         
-    def _inputHandler(self,label,link):
+    def _inputHandler(self,label,link,weight):
         #check if the label and link already exist or not
         if self.vertices.isEmpty() is False:
             if self.hasVertex(label) is False and self.hasVertex(link) is False:
                 self.addVertex(label)
                 self.addVertex(link)
-                self.addEdge(label,link)
+                self.addEdge(label,link,weight)
             elif self.hasVertex(label) is True and self.hasVertex(link) is False:
                 self.addVertex(link)
-                self.addEdge(label,link)
+                self.addEdge(label,link,weight)
             elif self.hasVertex(label) is False and self.hasVertex(link) is True:
                 self.addVertex(label)
-                self.addEdge(label, link)
+                self.addEdge(label, link,weight)
             elif self.hasVertex(label) is True and self.hasVertex(link) is True:
                 # TODO put a check to make sure there isnt already a edge
-                self.addEdge(label,link)
+                self.addEdge(label,link,weight)
         else:
             self.addVertex(label)
             self.addVertex(link)  
-            self.addEdge(label,link)
+            self.addEdge(label,link,weight)
 
     def addVertex(self,label):
         node = DSAGraphNode(label)
         self.vertices.insertLast(node)
         self.vertCount +=1
 
-    def addEdge(self,lab1,lab2):
+    def addEdge(self,lab1,lab2,weight):
         node1 = self.getVertex(lab1)
         node2 = self.getVertex(lab2)
-        node1.addEdge(node2)
-        node2.addEdge(node1)
+        edge1 = DSAGraphEdge(lab1,lab2,weight)
+        edge2 = DSAGraphEdge(lab2,lab1,weight)
+        node1.addEdge(edge1)
+        node2.addEdge(edge2)
         self.edgeCount +=1
     
     def hasVertex(self,lab):
@@ -75,7 +82,6 @@ class DSAGraph():
     def getEdgeCount(self):
         return self.edgeCount
     
-    #redo
     def getVertex(self,lab):
         vertex = None
         myIter = iter(self.vertices)
@@ -88,9 +94,6 @@ class DSAGraph():
             return vertex
         else:
             print("Node not found")
-        
-        #vertice = self.vertices.findNode(lab)
-        #return vertice
 
     def getAdjacent(self,label):
         vertex = self.getVertex(label)
@@ -104,6 +107,18 @@ class DSAGraph():
             if lab2 == value:
                 adBool = True
         return adBool
+    
+    def getEdge(self,lab1,lab2):
+        edge = None
+        if self.isAdjacent(lab1,lab2) != True:
+            print("No edge found")
+        else:
+            vertex = self.getVertex(lab1)
+            edges = vertex.getEdges()
+            for i in range(len(edges)):
+                if edges[i].getFrom() == lab2:
+                    edge = edges[i]
+        return edge
 
     def displayAsList(self):
         myIter = iter(self.vertices)
@@ -113,7 +128,6 @@ class DSAGraph():
                 label = value.getLabel()
                 adList = value.getAdjacent()
                 print(label,":",adList)
-
 
     def displayAsMatrix(self):
         x = self.vertCount
@@ -200,8 +214,7 @@ class DSAGraphNode():
         self.visited = False
         self.links = DSALinkedList()
         self.count = 0
-
-        
+       
     def getLabel(self):
         return self.label
 
@@ -211,9 +224,20 @@ class DSAGraphNode():
         value = next(myIter)
         count = 0
         for value in self.links:
-            testVals[count] = value.getLabel()
+            testVals[count] = value.getTo()
             count +=1
         testVals = inSort.insertionSort(testVals)
+        return testVals
+    
+    def getEdges(self):
+        testVals = np.empty(self.count,dtype=object)
+        myIter = iter(self.links)
+        value = next(myIter)
+        count = 0
+        for value in self.links:
+            testVals[count] = value
+            count +=1
+        testVals = inSort.insertionSort(testVals)    
         return testVals
     
     def addEdge(self,vertex):
@@ -227,8 +251,25 @@ class DSAGraphNode():
         return self.visited
 
     def __str__(self):
-        print("Vertex",self.label,"Links:",self.links)
+        return f"Vertex {self.label} Links: {self.links}"
 
+class DSAGraphEdge():
 
+    def __init__(self,fromVertex,toVertex,inWeight):
+        self.fVertex = fromVertex
+        self.tVertex = toVertex
+        self.weight = inWeight
+
+    def getWeight(self):
+        return self.weight
+    
+    def getFrom(self):
+        return self.fVertex
+    
+    def getTo(self):
+        return self.tVertex
+
+    def __str__(self):
+        return f"From: {self.fVertex} To: {self.tVertex} Distance: {self.weight}"
 
 
