@@ -145,6 +145,12 @@ class DSAHashTable():
         hashInd = 0
         i = 0
         inKey = str(inKey)
+        if not inKey.isdigit():
+            sum = 0
+            for char in inKey:
+                sum += ord(char)
+            inKey = sum
+        inKey = str(inKey)
         for i in range(len(inKey)):
             hashInd = (hashInd * a) + int(inKey[i])
             a*=b
