@@ -1,3 +1,4 @@
+from LocationInfo import *
 class DSAHashEntry():
     #field str
     #value obj
