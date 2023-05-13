@@ -3,6 +3,7 @@ from os import abort
 import numpy as np
 from DSAHashEntry import *
 import csv
+from LocationInfo import *
 
 class DSAHashTable():
     #hash Array (DSAHASHEntry array)
@@ -16,6 +17,7 @@ class DSAHashTable():
             self.hashArray[i] = DSAHashEntry()
 
     def put(self,inKey, inValue):
+        inValue = self.createLocationInfo(inValue[0],inValue[1],inValue[2])
         if self.getLoadFactor() >= 0.75:
             self.resize(len(self.hashArray)*2)
         hashInd = self.hash(inKey)
@@ -34,7 +36,11 @@ class DSAHashTable():
                 self.hashArray[hashInd].setValue(inValue)
                 self.hashArray[hashInd].setState(1)
         self.count += 1
-
+    
+    def createLocationInfo(self,temp,humidity,wind):
+        locationDets = locationInfo(temp,humidity,wind)
+        return locationDets
+    
     def findEmpty(self,inKey):
         hash1 = self.hash(inKey)
         hash2 = self.doubleHash(inKey)
@@ -98,7 +104,7 @@ class DSAHashTable():
     def getLoadFactor(self):
         lf = self.count / len(self.hashArray)
         return lf
-
+    
     def exportCsv(self,fileName):
         try:
             with open(fileName,"w",newline='') as csvfile :
@@ -110,18 +116,23 @@ class DSAHashTable():
         except IOError as e:
             print("Error in file processing"+str(e))
     
-    def importCsv(self):
+    def importFile(self):
         try:
-            with open("RandomNames7000.csv","r") as csvfile:
-                data = csv.reader(csvfile,delimiter=',')
-                for row in data:
-                    key = int(row[0])
-                    value = row[1]
-                    entry = DSAHashEntry(key,value)
+            with open("UAVdata.txt","r") as file:
+                for line in file:
+                    line = line.strip()
+                    print(line)
+                    
+                    key = line[0]
+                    values = np.array([int(v) for v in line[2:].split()])
+                    #value = np.empty(2,dtype=int)
+                    #value[0]=line[1]
+                    #value[1]=line[2]
+                    #value[2]=line[3]
                    # print("Reading in:")
                    # print(key)
                    # print(row)
-                    self.put(key,value)
+                    self.put(key,values)
         except IOError as e:
             print("Error in fileprocessing"+str(e))
     
