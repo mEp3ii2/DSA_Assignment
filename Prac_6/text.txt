@@ -1,0 +1,14 @@
+print("\nTest  - ")
+print("======================")
+try:
+    numTest +=1
+    if :
+        pass 
+    numPass +=1
+    print("Passed")
+except:
+    print("Failed")
+
+print("\n Test results")
+print(str(numPass)+"/"+str(numTest))
+print(str(numPass/numTest*100)+"% passed")
