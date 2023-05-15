@@ -116,7 +116,7 @@ class DSAGraph():
             vertex = self.getVertex(lab1)
             edges = vertex.getEdges()
             for i in range(len(edges)):
-                if edges[i].getFrom() == lab2:
+                if edges[i].getTo() == lab2:
                     edge = edges[i]
         return edge
 
@@ -204,6 +204,36 @@ class DSAGraph():
         while t.isEmpty() is not True:
             print(t.dequeue().getLabel())
 
+    # goes through vertext list and removes 
+    # vertex from graph
+    def removeVertex(self,lab):
+        label = lab
+        lab = self.getVertex(lab)
+        currNode = self.vertices.head
+        nodeFound = False
+        while currNode is not None and nodeFound == False:
+            if currNode.getValue() == lab:
+                if currNode.getPrev() is None:
+                    self.vertices.removeFirst()
+                elif currNode.getNext() is None:
+                    self.vertices.removeLast()
+                    self.updateAdjacencies(label)
+                else:
+                    currNode.getPrev().setNext(currNode.getNext())
+                    currNode.getNext().setPrev(currNode.getPrev())
+                self.updateAdjacencies(label)
+                nodeFound = True
+            currNode = currNode.getNext()
+    
+    #updates adjacency lists of all vertexes
+    def updateAdjacencies(self,lab):
+        currNode = self.vertices.head
+        while currNode is not None:
+            vertex =currNode.getValue()
+            vertex.updateEdges(lab)
+            currNode = currNode.getNext()
+        
+
 #           Vertex
 class DSAGraphNode():
     # fields label,[links], visited
@@ -237,7 +267,7 @@ class DSAGraphNode():
         for value in self.links:
             testVals[count] = value
             count +=1
-        testVals = inSort.insertionSort(testVals)    
+        #testVals = inSort.insertionSort(testVals)    
         return testVals
     
     def addEdge(self,vertex):
@@ -249,6 +279,23 @@ class DSAGraphNode():
 
     def getVisited(self):
         return self.visited
+
+    def updateEdges(self,lab):
+        currNode = self.links.head
+        deleted = False
+        while currNode is not None and deleted == False:
+            if currNode.getValue().getTo() == lab:
+                if currNode.getPrev() is None:
+                    self.links.removeFirst()
+                elif currNode.getNext() is None:
+                    self.links.removeLast()
+                else:
+                    currNode.getPrev().setNext(currNode.getNext())
+                    currNode.getNext().setPrev(currNode.getPrev())
+                deleted  = True
+                self.count -=1
+            currNode = currNode.getNext()
+        
 
     def __str__(self):
         return f"Vertex {self.label} Links: {self.links}"
