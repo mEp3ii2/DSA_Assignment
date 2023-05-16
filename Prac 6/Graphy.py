@@ -204,6 +204,20 @@ class DSAGraph():
         while t.isEmpty() is not True:
             print(t.dequeue().getLabel())
 
+    def minDist(self):
+        pass
+    def findVertex(self,src):
+        dist = np.full(self.vertCount,np.iinfo(np.int32).max,dtype=np.int32)
+        dist[src] = 0
+        sptSet = np.zeros(self.vertCount,dtype=bool)
+
+        for cout in range(self.vertCount):
+            x = self.minDist(dist,sptSet)
+            sptSet[x] = True
+
+            for y in range(self.vertCount):
+                if 
+
 #           Vertex
 class DSAGraphNode():
     # fields label,[links], visited
