@@ -15,6 +15,10 @@ def readData():
 
 myGraph = readData()
 myGraph.displayAsList()
-myGraph.displayAsMatrix()
-myGraph.breadFirstSearch()
-myGraph.deepFirstSearch()
+#myGraph.displayAsMatrix()
+#myGraph.breadFirstSearch()
+#myGraph.deepFirstSearch()
+print(myGraph.getEdge('A','B'))
+print(myGraph.getEdge('C','B'))
+myGraph.removeVertex('J')
+myGraph.displayAsList()
