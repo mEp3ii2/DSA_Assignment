@@ -1,8 +1,9 @@
+import sys
 from LinkedList import *
 import numpy as np
 import StackAndQ as sq
 import inSort
-
+import testyboi as tb
 class DSAGraph():
     # fields: vertices, edge(DsaLinkedList)
     
@@ -10,6 +11,15 @@ class DSAGraph():
         self.vertices = DSALinkedList()
         self.vertCount = 0
         self.edgeCount = 0
+    def getertexCount(self):
+        return self.vertCount
+    
+    def floatChecker(self,temp):
+        try:
+            float(temp)
+            return True
+        except ValueError:
+            return False
 
     # process the inout before handing over
     def inputHandler(self,label,link,weight):
@@ -18,11 +28,14 @@ class DSAGraph():
                 raise AttributeError("Invalid input type")
             elif len(label) != 1 or len(link) != 1:
                 raise ValueError("Only chars acepted for vertxes")
-            weight = float(weight)
+            if self.floatChecker(weight) == True:
+                weight = float(weight)
+            else:
+                raise ValueError("Only float values accepted for weight")
             if weight <= 0:
                 raise ValueError("Edge weight must a positive number")
         except AttributeError as e:
-                print("Only Char character accepted")
+                print("Only Char character accepted for vertexes")
         except ValueError as e:
             print("Invalid input detected: "+str(e))
         else:
@@ -94,7 +107,17 @@ class DSAGraph():
             return vertex
         else:
             print("Node not found")
-
+    
+    def getVertexByCount(self, count):
+        vertex = self.vertices.head
+        index = 0
+        while vertex is not None:
+            if index == count:
+                return vertex.getLabel()
+            index+=1
+            vertex = vertex.getNext()
+        return None 
+    
     def getAdjacent(self,label):
         vertex = self.getVertex(label)
         return vertex.getAdjacent()
@@ -128,6 +151,15 @@ class DSAGraph():
                 label = value.getLabel()
                 adList = value.getAdjacent()
                 print(label,":",adList)
+    
+    def displayVisitStatus(self):
+        myIter = iter(self.vertices)
+        value = next(myIter)
+        for value in self.vertices:
+            if value is not None:
+                label = value.getLabel()
+                visit = value.getVisited()
+                print(label,":",visit)
 
     def displayAsMatrix(self):
         x = self.vertCount
@@ -150,25 +182,21 @@ class DSAGraph():
     def breadFirstSearch(self):
         t = sq.DSAQueue()
         q = sq.DSAQueue()
-        myIter = iter(self.vertices)
-        value = next(myIter)
-        for value in self.vertices:
-            if value is not None:
-                value.setVisited(False)
-        v= self.vertices.head.getValue()
-        v.setVisited(True)
-        print("Start Value:",v.getLabel())
-        q.enqueue(v)
-        t.enqueue(v)
+        self.UnVisit()
+        start_Vertex= self.vertices.head.getValue()
+        start_Vertex.setVisited(True)
+        print("Start Value:",start_Vertex.getLabel())
+        q.enqueue(start_Vertex)
+        t.enqueue(start_Vertex)
         while q.isEmpty() is not True:
-            v = q.dequeue()
-            adList =v.getAdjacent()
+            start_Vertex = q.dequeue()
+            adList =start_Vertex.getAdjacent()
             for value in adList:
-                w = self.getVertex(value)
-                if w.getVisited() == False:
-                    w.setVisited(True)
-                    q.enqueue(w)
-                    t.enqueue(w)
+                neighbor = self.getVertex(value)
+                if neighbor.getVisited() == False:
+                    neighbor.setVisited(True)
+                    q.enqueue(neighbor)
+                    t.enqueue(neighbor)
         
         print("bread:")
         while t.isEmpty() is not True:
@@ -177,10 +205,7 @@ class DSAGraph():
     def deepFirstSearch(self):
         t = sq.DSAQueue()
         s = sq.DSAStack()
-        myIter = iter(self.vertices)
-        value = next(myIter)
-        for value in self.vertices:
-                value.setVisited(False)
+        self.UnVisit()
         v= self.vertices.head.getValue()
         v.setVisited(True)
         s.push(v)
@@ -203,20 +228,54 @@ class DSAGraph():
         print("deep:")
         while t.isEmpty() is not True:
             print(t.dequeue().getLabel())
+    
+    def UnVisit(self):
+        for vertex in self.vertices:
+            vertex.setVisited(False)
+        #myIter = iter(self.vertices)
+        #value = next(myIter)
+        #for value in self.vertices:
+        #        value.setVisited(False)
 
-    def minDist(self):
-        pass
-    def findVertex(self,src):
-        dist = np.full(self.vertCount,np.iinfo(np.int32).max,dtype=np.int32)
-        dist[src] = 0
-        sptSet = np.zeros(self.vertCount,dtype=bool)
+    def dijkstra(self, source, dest):
+        source = self.getVertex(source)
+        dest = self.getVertex(dest)
+        self.UnVisit()
+        path = self.djSearch(source,dest)
+        #path = tb.findShortestPath(self,source,dest)
+        return path
+    def djSearch(self,source,dest):
+        queue = sq.DSAQueue()
+        path = DSALinkedList()
+        self.UnVisit()
 
-        for cout in range(self.vertCount):
-            x = self.minDist(dist,sptSet)
-            sptSet[x] = True
+        source.setVisited(True)
+        queue.enqueue(source)
 
-            for y in range(self.vertCount):
-                if 
+        while not queue.isEmpty():
+            currNode = queue.dequeue()
+            path.insertLast(currNode.getLabel())
+        
+            edges = currNode.getEdges()
+
+            lowWeight = float('inf')
+            lowVertex = None
+
+            for edge in edges:
+                #if edge.getTo() == dest.getLabel():
+                #    path.insertLast(edge.getTo())
+                #    return path
+                #else:
+                if float(edge.getWeight()) < float(lowWeight):
+                    lowWeight = edge.getWeight()
+                    lowVertex = self.getVertex(edge.getTo())
+
+            if lowVertex.getVisited() == False:
+                lowVertex.setVisited(True)
+                queue.enqueue(lowVertex)
+
+        self.displayVisitStatus()
+        return path
 
 #           Vertex
 class DSAGraphNode():
@@ -228,7 +287,7 @@ class DSAGraphNode():
         self.visited = False
         self.links = DSALinkedList()
         self.count = 0
-       
+
     def getLabel(self):
         return self.label
 
@@ -240,7 +299,7 @@ class DSAGraphNode():
         for value in self.links:
             testVals[count] = value.getTo()
             count +=1
-        testVals = inSort.insertionSort(testVals)
+        #testVals = inSort.insertionSort(testVals)
         return testVals
     
     def getEdges(self):
@@ -251,7 +310,7 @@ class DSAGraphNode():
         for value in self.links:
             testVals[count] = value
             count +=1
-        testVals = inSort.insertionSort(testVals)    
+        #testVals = inSort.insertionSort(testVals)    
         return testVals
     
     def addEdge(self,vertex):
@@ -265,7 +324,8 @@ class DSAGraphNode():
         return self.visited
 
     def __str__(self):
-        return f"Vertex {self.label} Links: {self.links}"
+        return f"Vertex {self.label}"
+        #Links: {self.links}"
 
 class DSAGraphEdge():
 

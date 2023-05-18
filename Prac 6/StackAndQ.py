@@ -41,7 +41,8 @@ class DSAQueue():
     def isEmpty(self):
         if self.queue.isEmpty():
             return True
-    
+        else:
+            return False
     # adds item to the queue
     def enqueue(self,value):
         self.queue.insertLast(value)
