@@ -10,7 +10,16 @@ class DSAGraph():
         self.vertices = DSALinkedList()
         self.vertCount = 0
         self.edgeCount = 0
-
+    def getertexCount(self):
+        return self.vertCount
+    
+    def floatChecker(self,temp):
+        try:
+            float(temp)
+            return True
+        except ValueError:
+            return False
+        
     # process the inout before handing over
     def inputHandler(self,label,link,weight):
         try:
@@ -18,7 +27,10 @@ class DSAGraph():
                 raise AttributeError("Invalid input type")
             elif len(label) != 1 or len(link) != 1:
                 raise ValueError("Only chars acepted for vertxes")
-            weight = float(weight)
+            if self.floatChecker(weight)== True:
+                weight = float(weight)
+            else:
+                raise ValueError("Only float values accepted for weight")
             if weight <= 0:
                 raise ValueError("Edge weight must a positive number")
         except AttributeError as e:
@@ -128,6 +140,14 @@ class DSAGraph():
                 label = value.getLabel()
                 adList = value.getAdjacent()
                 print(label,":",adList)
+    def displayVisitStatus(self):
+        myIter = iter(self.vertices)
+        value = next(myIter)
+        for value in self.vertices:
+            if value is not None:
+                label = value.getLabel()
+                visit = value.getVisited()
+                print(label,":",visit)
 
     def displayAsMatrix(self):
         x = self.vertCount
@@ -145,6 +165,24 @@ class DSAGraph():
         for i in range(len(arr)):
             for j in range(len(arr)):
                 print(int(arr[i][j]),end= ' ')
+            print()
+    
+    def displayWeightAsMatrix(self):
+        x = self.vertCount
+        arr = np.zeros((x,x),dtype=float)
+        myIter = iter(self.vertices)
+        value = next(myIter)
+        count = 0
+        for value in self.vertices:
+            if value is not None:
+                edgeList = value.getEdges()
+                for edge in edgeList:
+                    pos = ord(edge.getTo()) - 65 # get pos in alphabet
+                    arr[count][pos] = float(edge.getWeight())
+            count +=1
+        for i in range(len(arr)):
+            for j in range(len(arr)):
+                print((arr[i][j]),end= ' ')
             print()
 
     def breadFirstSearch(self):
@@ -203,7 +241,67 @@ class DSAGraph():
         print("deep:")
         while t.isEmpty() is not True:
             print(t.dequeue().getLabel())
+    def UnVisit(self):
+        for vertex in self.vertices:
+            vertex.setVisited(False)
+        #myIter = iter(self.vertices)
+        #value = next(myIter)
+        #for value in self.vertices:
+        #        value.setVisited(False)
+    
+    def dijkstra(self, source, dest):
+            source = self.getVertex(source)
+            dest = self.getVertex(dest)
+            self.UnVisit()
+            path = self.djSearch(source,dest)
+            return path
 
+    def djSearch(self,source,dest):
+        #queue = sq.DSAQueue()
+        path = DSALinkedList()
+        for vertex in self.vertices:
+                if vertex != source:
+                    vertex.setDistance(float('inf'))
+                else:
+                    vertex.setDistance(0)
+
+        currNode = source
+        currNode.setVisited(True)
+        path.insertFirst(currNode)
+
+        while True:
+            edges = currNode.getEdges()
+            minDistance = float('inf')
+            nextNode = None
+
+            # Find the unvisited neighbor with the minimum distance
+            for edge in edges:
+                vert = self.getVertex(edge.getTo())
+                if not vert.getVisited():
+                    distance = currNode.getDistance() + edge.getWeight()
+                    if distance < vert.getDistance():
+                        vert.setDistance(distance)
+                        vert.setPrevious(currNode)
+                        path.insertLast((edge.getTo(), distance))
+                    if vert.getDistance() < minDistance:
+                        minDistance = vert.getDistance()
+                        nextNode = vert
+
+            if nextNode is None:
+                break
+
+            currNode = nextNode
+            currNode.setVisited(True)
+
+    # Build the shortest path from the destination to the source
+        shortestPath = DSALinkedList()
+        curr = dest
+        while curr is not None:
+            shortestPath.insertFirst((curr.getLabel(), curr.getDistance()))
+            curr = curr.getPrevious()
+
+        return shortestPath
+    
     # goes through vertext list and removes 
     # vertex from graph
     def removeVertex(self,lab):
@@ -244,7 +342,10 @@ class DSAGraphNode():
         self.visited = False
         self.links = DSALinkedList()
         self.count = 0
-       
+        self.distance = float('inf')
+        self.previous = None
+        self.next = None
+
     def getLabel(self):
         return self.label
 
@@ -296,6 +397,17 @@ class DSAGraphNode():
                 self.count -=1
             currNode = currNode.getNext()
         
+    def setPrevious(self,previous):
+        self.previous = previous
+    
+    def getPrevious(self):
+        return self.previous
+    
+    def getNext(self):
+        return self.next
+    
+    def setNext(self,next):
+        self.next = next
 
     def __str__(self):
         return f"Vertex {self.label} Links: {self.links}"
