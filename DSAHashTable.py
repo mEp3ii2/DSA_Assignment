@@ -125,7 +125,6 @@ class DSAHashTable():
             with open("UAVdata.txt","r") as file:
                 for line in file:
                     line = line.strip()
-                    print(line)
                     
                     key = line[0]
                     values = np.array([int(v) for v in line[2:].split()])

@@ -13,12 +13,4 @@ def readData():
     else:
         return graph
 
-myGraph = readData()
-myGraph.displayAsList()
-#myGraph.displayAsMatrix()
-#myGraph.breadFirstSearch()
-#myGraph.deepFirstSearch()
-print(myGraph.getEdge('A','B'))
-print(myGraph.getEdge('C','B'))
-myGraph.removeVertex('J')
-myGraph.displayAsList()
+

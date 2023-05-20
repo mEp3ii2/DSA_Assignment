@@ -18,7 +18,7 @@ class DSAHeap():
                 if not priority.isdigit():
                     raise AttributeError("Non integer value")
             priority = int(priority)
-            if priority <= 0:
+            if priority < 0:
                 raise ValueError("Negative Value detected for priority")
             if not value:
                 raise ValueError("Empty Value string detected")
@@ -63,7 +63,12 @@ class DSAHeap():
             print("List empty: "+str(e))
         else:    
             return temp '''
-
+    
+    def isEmpty(self):
+        if self.count == 0:
+            return True
+        else:
+            return False
 
     def display(self):
         for item in self.heap:

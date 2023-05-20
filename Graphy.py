@@ -239,7 +239,7 @@ class DSAGraph():
             if AllVisited:
                 s.pop()
 
-        print("deep:")
+        #print("deep:")
         #while t.isEmpty() is not True:
         #    print(t.dequeue().getLabel())
         return t 
@@ -412,6 +412,12 @@ class DSAGraphNode():
     def setNext(self,next):
         self.next = next
 
+    def setDistance(self,distance):
+        self.distance = distance
+    
+    def getDistance(self):
+        return self.distance
+    
     def __str__(self):
         return f"Vertex {self.label} Links: {self.links}"
 
