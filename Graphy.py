@@ -140,6 +140,7 @@ class DSAGraph():
                 label = value.getLabel()
                 adList = value.getAdjacent()
                 print(label,":",adList)
+
     def displayVisitStatus(self):
         myIter = iter(self.vertices)
         value = next(myIter)
@@ -239,8 +240,10 @@ class DSAGraph():
                 s.pop()
 
         print("deep:")
-        while t.isEmpty() is not True:
-            print(t.dequeue().getLabel())
+        #while t.isEmpty() is not True:
+        #    print(t.dequeue().getLabel())
+        return t 
+    
     def UnVisit(self):
         for vertex in self.vertices:
             vertex.setVisited(False)
