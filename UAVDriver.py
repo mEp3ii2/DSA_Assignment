@@ -76,7 +76,74 @@ def UavOptMsg():
     print("1: View Current Location")
     print("2: Travel to new location")
 
+def UavSel():
+    uavSel = False
+    print("Please select your UAV using the UAV ID")
+    for uav in uavList:
+        print("UAV "+str(uav.getID()))
+    sel = int(input("Selection: "))
+    for uav in uavList:
+        if uav.getID() == sel:
+            currUAV = uav
+            uavSel = True
+        if uavSel == False:
+            print("No UAV selected!")
+    return currUAV
+
+def insertLocation(graph,heap,hashTb):
+    nextVertex = chr(65 + graph.getVertexCount())
+    print("New vertex "+str(nextVertex)+" has been created")
+    connected = False
+    while connected == False:
+        print("Please provide a connection location")
+        graph.displayVertexes()
+        connection = input("Selection: ")
+        check = graph.getVertex(connection.upper())
+        if check == None:
+            print("Invalid selection please try again")
+        elif isinstance(check,DSAGraphNode):
+            connected = True
+    weighted = False
+    while weighted == False:
+        print("Please enter the distance between "+str(nextVertex)+" and "+str(connection))
+        weight = input("Distance: ")
+        if graph.floatChecker(weight):
+            weight = float(weight)
+        else:
+            print("Not a valid float")
+        if weight <= 0:
+            print("Weight must be above zero")
+        else:
+            weighted = True
+    locationData = False
+    while locationData == False:
+        pr
+    _insertLocation(graph,heap,hashTb,nextVertex,connection,weight)
+
+def _insertLocation(graph,heap,hashTb,nextVertex,connection,weight):
+    graph.inputHandler(nextVertex,connection,weight)
+
+
+    
+ 
+def removeLocation(graph,heap,hashTb,label):
+    graph.removeVertex(label)
+    hashTb.remove(label)
+    # need operation for specific heap remove
+    # this shit efficent as fuck
+    arr = np.empty(graph.getVertexCount()-1,dtype=object)
+    index = 0
+    while not heap.isEmpty():
+        value=heap.remove()
+        if value.getValue() != label:
+            arr[index]= value
+            index += 1
+    for i in range(len(arr)):
+        heap.add(arr[i].getPriority(),arr[i].getValue())
+    print("Location "+str(label)+" has been removed")
+
 menuMsg()
+
 uavList = DSALinkedList()
 filesLoaded = False
 currUAV = None
@@ -114,18 +181,8 @@ while run:
             uavList.insertLast(UAV)
 
     elif usrInp == '3':
-        uavSel = False
         print("3: Select UAV")
-        print("Please select your UAV using the UAV ID")
-        for uav in uavList:
-            print("UAV "+str(uav.getID()))
-        sel = int(input("Selection: "))
-        for uav in uavList:
-            if uav.getID() == sel:
-                currUAV = uav
-                uavSel = True
-        if uavSel == False:
-            print("No UAV selected!")
+        currUAV = UavSel()
 
     elif usrInp == '4':
         print("4: UAV operations")
@@ -134,28 +191,47 @@ while run:
         print("5: View locations")
         pass
     elif usrInp == '6':
-        print("6: Location Options('Insert', 'Delete','Search')")
-        pass
+        print("6: Location Options")
+        print("A: Insert new location")
+        print("B: Delete location")
+        print("C: Search location")
+        selection = input("Selection: ")
+        selection = selection.upper()
+        if selection == 'A':
+            insertLocation(graph,heap,hashTb)
+        elif selection == 'B':
+            pass
+        elif selection == 'C':
+            pass
+        else:
+            print("Invalid operation returning back to the main menu")
     elif usrInp == '7':
         print("7: Traverse the list via high to low risk")
-        travelList = np.empty(graph.getVertexCount(),dtype=object)
+        if currUAV is None:
+            print("Please select a UAV before proceeding ")
+            currUAV = UavSel()
+        
+        travelList = np.empty(graph.getVertexCount()-1,dtype=object)
         index = 0
         totDistance = 0
+        initLocation = currUAV.getLocation()
+        
         print("UAV "+str(currUAV.getID())+" itinerary")
         itinerary = str(currUAV.getLocation())+' -> '
         while not heap.isEmpty():
             dest = heap.remove()
-            path = graph.dijkstra(currUAV.getLocation(),dest.getValue())
-            end = path.removeLast()
-            currUAV.setLocation(end[0])
-            totDistance += end[1]
-            travelList[index]= end[0]
-            print(index)
+            if dest.getValue() != initLocation:
+                path = graph.dijkstra(currUAV.getLocation(),dest.getValue())
+                end = path.removeLast()
+                currUAV.setLocation(end[0])
+                totDistance += end[1]
+                travelList[index]= end[0]
+                index += 1
         for char in travelList:
             itinerary += str(char)+ ' -> '
         itinerary = itinerary.rstrip(' -> ')
         print(itinerary) 
-        print("Total distance: "+str(totDistance))
+        print("Total distance: {:.2f}".format(totDistance))
     elif usrInp == '8':
         pass
     elif usrInp == '9':

@@ -140,7 +140,16 @@ class DSAGraph():
                 label = value.getLabel()
                 adList = value.getAdjacent()
                 print(label,":",adList)
+    
+    def displayVertexes(self):
+        myIter = iter(self.vertices)
+        value = next(myIter)
+        for value in self.vertices:
+            if value is not None:
+                label = value.getLabel()
+                print(label)
 
+        
     def displayVisitStatus(self):
         myIter = iter(self.vertices)
         value = next(myIter)
@@ -247,6 +256,7 @@ class DSAGraph():
     def UnVisit(self):
         for vertex in self.vertices:
             vertex.setVisited(False)
+            vertex.setPrevious(None)
         #myIter = iter(self.vertices)
         #value = next(myIter)
         #for value in self.vertices:
@@ -439,5 +449,3 @@ class DSAGraphEdge():
 
     def __str__(self):
         return f"From: {self.fVertex} To: {self.tVertex} Distance: {self.weight}"
-
-
