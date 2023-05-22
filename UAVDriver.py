@@ -77,20 +77,70 @@ def UavOptMsg():
     print("2: Travel to new location")
 
 def UavSel():
+    selUAv = None
     uavSel = False
-    print("Please select your UAV using the UAV ID")
-    for uav in uavList:
-        print("UAV "+str(uav.getID()))
-    sel = int(input("Selection: "))
-    for uav in uavList:
-        if uav.getID() == sel:
-            currUAV = uav
-            uavSel = True
-        if uavSel == False:
-            print("No UAV selected!")
-    return currUAV
+    if not uavList.isEmpty():
+        print("Please select your UAV using the UAV ID")
+        for uav in uavList:
+            print("UAV "+str(uav.getID()))
+        sel = int(input("Selection: "))
+        for uav in uavList:
+            if uav.getID() == sel:
+                selUAv = uav
+                uavSel = True
+            if uavSel == False:
+                print("No UAV selected!")
+        return selUAv
+    else:
+        print("No uavs to select!!")
+def locationInfoValidater():
+    print("Please provide the location data")
+    tempValid = False
+    while tempValid == False:
+        try:
+            print("Please enter the temperature value")
+            temp = input("Temperature: ")
+            temp = int(temp)
+            if temp < 25:
+                raise ValueError("Temperature value cannot be below 25")
+        except ValueError as e:
+            print("Invalid temperature "+str(e))
+        else:
+            tempValid = True
+
+    humidValid = False
+    while humidValid == False:
+        try:
+            print("Please enter the humidty")
+            humidity = input("Humidity: ")
+            humidity = int(humidity)
+            if not 0<=humidity <= 100:
+                raise ValueError("Humidity value must be between 0-100")
+        except ValueError as e:
+            print("Invalid humidity "+str(e))
+        else:
+            humidValid = True
+
+    windValid = False
+    while windValid == False:
+        try:
+            print("Please enter the wind speed")
+            wind = input("Wind speed: ")
+            wind = int(wind)
+            if wind < 0:
+                raise ValueError("Wind speed cannot be negative")
+        except ValueError as e:
+            print("Invalid wind speed "+str(e))
+        else:
+            windValid = True
+    arr = np.empty(3)
+    arr[0]=temp
+    arr[1]=humidity
+    arr[2]=wind
+    return arr
 
 def insertLocation(graph,heap,hashTb):
+
     nextVertex = chr(65 + graph.getVertexCount())
     print("New vertex "+str(nextVertex)+" has been created")
     connected = False
@@ -115,14 +165,16 @@ def insertLocation(graph,heap,hashTb):
             print("Weight must be above zero")
         else:
             weighted = True
-    locationData = False
-    while locationData == False:
-        pr
-    _insertLocation(graph,heap,hashTb,nextVertex,connection,weight)
+    locationData = locationInfoValidater()
+    _insertLocation(graph,heap,hashTb,nextVertex,connection,weight,locationData)
 
-def _insertLocation(graph,heap,hashTb,nextVertex,connection,weight):
+def _insertLocation(graph,heap,hashTb,nextVertex,connection,weight,locationData):
     graph.inputHandler(nextVertex,connection,weight)
-
+    hashTb.put(nextVertex,locationData)
+    vert = hashTb.get(nextVertex)
+    risk = riskLvlCalc(vert)
+    heap.add(risk,nextVertex)
+    print("New location has been added")
 
     
  
