@@ -17,7 +17,11 @@ class DSAHashTable():
             self.hashArray[i] = DSAHashEntry()
 
     def put(self,inKey, inValue):
-        inValue = self.createLocationInfo(inValue[0],inValue[1],inValue[2])
+        if isinstance(inValue,np.ndarray):
+            temp =inValue[0]
+            humid = inValue[1]
+            wind = inValue[2]
+            inValue = self.createLocationInfo(temp,humid,wind)
         if self.getLoadFactor() >= 0.75:
             self.resize(len(self.hashArray)*2)
         hashInd = self.hash(inKey)
@@ -80,7 +84,7 @@ class DSAHashTable():
             return self.hashArray[hashInd].getValue()
         else: 
             return None
-
+        
     def remove(self,inKey):
         hashInd = self.find(inKey)
         if hashInd is not None:
@@ -121,7 +125,6 @@ class DSAHashTable():
             with open("UAVdata.txt","r") as file:
                 for line in file:
                     line = line.strip()
-                    print(line)
                     
                     key = line[0]
                     values = np.array([int(v) for v in line[2:].split()])
@@ -214,7 +217,3 @@ class DSAHashTable():
     #Option methods
     def findKey(inKey):
         pass
-
-    
-
-
