@@ -12,5 +12,3 @@ def readData():
         print("Error in file processing: "+str(e))
     else:
         return graph
-
-

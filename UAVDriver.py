@@ -70,6 +70,7 @@ def menuMsg():
     print("6: Location Options('Insert', 'Delete','Search')")
     print("7: Traverse the list via high to low risk")
     print("8: Save Information to files")
+    print("9: Graph Methods demonstration\n")
 
 def UavOptMsg():
     print("UAV options")
@@ -93,6 +94,7 @@ def UavSel():
         return selUAv
     else:
         print("No uavs to select!!")
+
 def locationInfoValidater():
     print("Please provide the location data")
     tempValid = False
@@ -194,6 +196,30 @@ def removeLocation(graph,heap,hashTb,label):
         heap.add(arr[i].getPriority(),arr[i].getValue())
     print("Location "+str(label)+" has been removed")
 
+def searchlocation(hashtb):
+    search = input("Please enter the location name: ").upper()
+    location = hashtb.get(search)
+    if location is None:
+        print("Location Not found")
+    else:
+        print("Location '"+str(search)+"'")
+        print(str(location)+'\n')
+    
+def loadCheck(filesLoaded):
+    load = True
+    if not filesLoaded:
+        print("Error: Files have't been loaded!\n")
+        load = False
+    return load
+
+def uavCheck(currUAV):
+    load = True
+    if currUAV == None:
+        print("No UAV selected!")
+        print("PLease select a UAV first\n")
+        load = False
+    return load
+
 menuMsg()
 
 uavList = DSALinkedList()
@@ -203,6 +229,7 @@ run = True
 
 while run:
     print("Please enter a number to select your operation enter 'f' to view the options again")
+    print("Or enter 'x' to exit")
     usrInp = input("Selection: ")
 
     if usrInp == '1':
@@ -214,23 +241,23 @@ while run:
     
     elif usrInp == '2':
         print("2: Launch UAV")
-        if filesLoaded == True:
-            try:
-                location = input("Please enter a starting location: ")
-                if len(location) !=1  or not location.isalpha():
-                    raise AttributeError("Location should be a char")
-                start = graph.getVertex(location)
-                if start is None:
-                    raise ValueError("Location "+str(location)+" not in the graph")
-            except AttributeError as e:
-                print("Input was invalid: "+str(e))
-            except ValueError as e:
-                print("Location not found please try again")
-            else:
-
-                uavList.insertLast(UAV(location))
+        if loadCheck(filesLoaded) == False:
+            continue
+        try:
+            location = input("Please enter a starting location: ")
+            if len(location) !=1  or not location.isalpha():
+                raise AttributeError("Location should be a char")
+            start = graph.getVertex(location)
+            if start is None:
+                raise ValueError("Location "+str(location)+" not in the graph")
+        except AttributeError as e:
+            print("Input was invalid: "+str(e))
+        except ValueError as e:
+            print("Location not found please try again")
         else:
-            uavList.insertLast(UAV)
+
+            uavList.insertLast(UAV(location))
+            currUAV = uavList.peekLast()
 
     elif usrInp == '3':
         print("3: Select UAV")
@@ -239,30 +266,44 @@ while run:
     elif usrInp == '4':
         print("4: UAV operations")
         UavOptMsg()
+        selection = input("Selection: ")
+        if selection == 1:
+            pass
+        elif selection == 2:
+            pass
+        else:
+            print("Invalid operation returning back to the main menu\n")
+
     elif usrInp == '5':
         print("5: View locations")
+        if loadCheck(filesLoaded) == False:
+            continue
         pass
     elif usrInp == '6':
+        if loadCheck(filesLoaded) == False:
+            continue
         print("6: Location Options")
         print("A: Insert new location")
         print("B: Delete location")
         print("C: Search location")
         selection = input("Selection: ")
+        print()
         selection = selection.upper()
         if selection == 'A':
             insertLocation(graph,heap,hashTb)
         elif selection == 'B':
             pass
         elif selection == 'C':
-            pass
+            searchlocation(hashTb)
         else:
-            print("Invalid operation returning back to the main menu")
+            print("Invalid operation returning back to the main menu\n")
     elif usrInp == '7':
         print("7: Traverse the list via high to low risk")
-        if currUAV is None:
-            print("Please select a UAV before proceeding ")
-            currUAV = UavSel()
-        
+        if loadCheck(filesLoaded) == False:
+            continue
+        if uavCheck(currUAV) == False:
+            continue
+
         travelList = np.empty(graph.getVertexCount()-1,dtype=object)
         index = 0
         totDistance = 0
@@ -285,10 +326,48 @@ while run:
         print(itinerary) 
         print("Total distance: {:.2f}".format(totDistance))
     elif usrInp == '8':
-        pass
+        if loadCheck(filesLoaded) == False:
+            continue
     elif usrInp == '9':
-        pass
+        if loadCheck(filesLoaded) == False:
+            continue
+        print("Do everything")
+        print("Graph Adjaceny List")
+        print("===================")
+        graph.displayAsList()
+        print()
+
+        print("Graph Matrix")
+        print("============")
+        graph.displayAsMatrix()
+        print()
+
+        print("Graph Weight Matrix")
+        print("===================")
+        graph.displayWeightAsMatrix()
+        print()
+
+        print("Graph BFS")
+        print("=========")
+        graph.breadFirstSearch()
+        print()
+
+        print("Graph DFS")
+        print("=========")
+        vertexes = graph.deepFirstSearch()
+
+        while vertexes.isEmpty() is not True:
+            print(vertexes.dequeue().getLabel())
+        print()
+        
+        print("Hash Table Display")
+        print("==================")
+        hashTb.display()
+        print()
     elif usrInp == 'f':
         menuMsg()
+    elif usrInp == 'x':
+        print("Program Exiting Goodbye!")
+        run = False
     else:
-        print(usrInp+"is a invalid command please try again")
+        print(usrInp+" is a invalid command please try again\n")

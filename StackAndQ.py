@@ -67,4 +67,3 @@ class DSAQueue():
             raise IndexError("Queue is empty")
         else:
             return self.queue.peekLast()
-
